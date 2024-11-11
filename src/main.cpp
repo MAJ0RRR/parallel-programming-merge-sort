@@ -1,19 +1,25 @@
-#include "merge_sort_cpu.hpp"
-#include "utility.hpp"
+#include "tests.hpp"
 #include <iostream>
 #include <utility>
 #include <algorithm>
+#include <limits>
 
-int main()
+int main(int argc, char* argv[])
 {
-    // Problem size
-    const unsigned long size = 10000000;
-    const auto range = std::make_pair(-100000, 100000);
+    std::vector<std::string> args(argv + 1, argv + argc);
+     if (args.empty()) {
+        std::cerr << "No arguments provided. Try [all/test].\n";
+        return 1;
+    }
+
+    // Problem parameters
+    const unsigned long size = 100000000;
+    const auto range = std::make_pair(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
 
     // OpenMP Setup
     const unsigned int threads_count = omp_get_num_procs();
     omp_set_num_threads(threads_count);
-    std::cout<< "Starting with " << threads_count << " threads.\n";
+    std::cout<< "Running with " << threads_count << " threads.\n";
 
     // App Setup
     std::vector<int> input;
@@ -24,37 +30,19 @@ int main()
         });
     std::vector<int> v(input);
 
-    // STL Sort
-    Utility::measureExecutionTime("std::sort", 
-     [&]() {
-        std::sort(v.begin(), v.end());
-    });
-    Utility::validateSort(v);
-    v.assign(input.begin(), input.end());
+    for (const auto& arg : args) {
+        std::cout << "Mode: " << arg << std::endl;
 
-    // Merge Sort Sequential
-    Utility::measureExecutionTime("CPU::MergeSort::mergeSortSequential", 
-     [&]() {
-        CPU::MergeSort::sort(v, SEQUENTIAL);
-    });
-    Utility::validateSort(v);
-    v.assign(input.begin(), input.end());
-
-    // Merge Sort Sequential
-    Utility::measureExecutionTime("CPU::MergeSort::mergeSortSequentialWithCutOff", 
-     [&]() {
-        CPU::MergeSort::sort(v, SEQUENTIAL_WITH_CUT_OFF);
-    });
-    Utility::validateSort(v);
-    v.assign(input.begin(), input.end());
-
-    // Merge Sort Parallel
-    Utility::measureExecutionTime("CPU::MergeSort::mergeSortParallel", 
-     [&]() {
-        CPU::MergeSort::sort(v, PARALLEL);
-    });
-    Utility::validateSort(v);
-    v.assign(input.begin(), input.end());
-
+        if(arg == "all") {
+            runAll(v, input);
+        }
+        else if(arg == "test") {
+            runTests(v, input);
+        }
+        else{
+            std::cerr << "Invalid arguments. Try [all/test].\n";
+            return 1;
+        }
+    }    
     return 0;
 }

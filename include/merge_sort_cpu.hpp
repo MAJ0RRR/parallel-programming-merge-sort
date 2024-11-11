@@ -45,7 +45,7 @@ namespace CPU::MergeSort {
                 unsigned long mid = (left + right) /2;
                 #pragma omp taskgroup
                 {
-                    #pragma omp task shared(data) untied
+                    #pragma omp task shared(data)
                     mergeSortParallel(data, left, mid);
                     mergeSortParallel(data, mid + 1, right);
                 }

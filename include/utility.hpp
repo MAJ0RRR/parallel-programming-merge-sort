@@ -31,7 +31,7 @@ namespace Utility{
     }
 
     template <typename Func, typename... Args>
-    void measureExecutionTime(const std::string& funcName, Func&& func) {
+    std::chrono::duration<double, std::milli> measureExecutionTime(const std::string& funcName, Func&& func) {
         auto start = std::chrono::high_resolution_clock::now();
 
         std::invoke(std::forward<Func>(func));
@@ -40,7 +40,9 @@ namespace Utility{
 
         std::chrono::duration<double, std::milli> duration = end - start;
         std::cout << "Execution time of " << funcName << ": " << duration.count() << " ms" << std::endl;
+        return duration;
     }
+
     template <typename T>
     void validateSort(std::vector<T>& data)
     {
@@ -51,21 +53,6 @@ namespace Utility{
         else {
             std::cout << "Vector is not sorted correctly\n";
         }
-    }
-
-    void writeVectorToFile(const std::vector<int>& vec, const std::string& filename) {
-        std::ofstream outfile(filename);
-        if (!outfile) {
-            std::cerr << "Error opening file for writing: " << filename << std::endl;
-            return;
-        }
-        
-        for (int value : vec) {
-            outfile << value << " ";
-        }
-        outfile << std::endl;
-        
-        outfile.close();
     }
 }
 
