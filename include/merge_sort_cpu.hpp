@@ -9,8 +9,35 @@ enum OptimatizationLevel
 {
     SEQUENTIAL = 0,
     SEQUENTIAL_WITH_CUT_OFF = 1,
-    PARALLEL = 2
+    PARALLEL = 2,
+    ITERATIVE = 3
 };
+
+namespace CPU::IterativeMergeSort
+{
+    void merge(std::vector<int>& data, std::vector<int>& tmp, unsigned long left, unsigned long mid, unsigned long right) {
+        std::copy(data.begin() + left, data.begin() + right + 1, tmp.begin() + left);
+
+        std::merge(tmp.begin() + left, tmp.begin() + mid + 1, tmp.begin() + mid + 1, tmp.begin() + right + 1, data.begin() + left);
+    }
+
+    void sortParallel(std::vector<int>& data) {
+        unsigned long size = data.size();
+        std::vector<int> tmp(size);
+
+        for(unsigned long current_size = 1; current_size <= size - 1; current_size *= 2)
+        {
+            #pragma omp parallel for
+                for(unsigned long left = 0; left < size - 1; left += 2 * current_size)
+                {
+                    unsigned long mid = std::min(left + current_size - 1, size - 1);
+                    unsigned long right = std::min(left + 2 * current_size - 1, size - 1);
+
+                    merge(data, tmp, left, mid, right);
+                }
+        }
+    }
+}
 
 namespace CPU::MergeSort {
   void mergeSortSequential(std::vector<int>& data, unsigned long left, unsigned long right) {
@@ -71,6 +98,9 @@ namespace CPU::MergeSort {
                     #pragma omp parallel
                     #pragma omp single
                     mergeSortParallel(data, 0, data.size() - 1);
+                break;
+                case ITERATIVE:
+                    CPU::IterativeMergeSort::sortParallel(data);
                 break;
             }
         }

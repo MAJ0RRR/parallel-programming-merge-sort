@@ -37,6 +37,15 @@ void runTests(std::vector<int>& v, std::vector<int>& input)
 
     void runAll(std::vector<int>& v, std::vector<int>& input)
     {
+        // Merge Sort iTERATIVE
+        Utility::measureExecutionTime("CPU::IterativeMergeSort::sortParallel", 
+        [&]() {
+            CPU::MergeSort::sort(v, ITERATIVE);
+        });
+        Utility::validateSort(v);
+        v.assign(input.begin(), input.end());
+
+
         // STL Sort
         Utility::measureExecutionTime("std::sort", 
         [&]() {
