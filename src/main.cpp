@@ -13,13 +13,8 @@ int main(int argc, char* argv[])
     }
 
     // Problem parameters
-    const unsigned long size = 100000000;
+    const unsigned long size = 1000000;
     const auto range = std::make_pair(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-
-    // OpenMP Setup
-    const unsigned int threads_count = omp_get_num_procs();
-    omp_set_num_threads(threads_count);
-    std::cout<< "Running with " << threads_count << " threads.\n";
 
     // App Setup
     std::vector<int> input;
@@ -33,10 +28,7 @@ int main(int argc, char* argv[])
     for (const auto& arg : args) {
         std::cout << "Mode: " << arg << std::endl;
 
-        if(arg == "all") {
-            runAll(v, input);
-        }
-        else if(arg == "test") {
+        if(arg == "test") {
             runTests(v, input);
         }
         else{

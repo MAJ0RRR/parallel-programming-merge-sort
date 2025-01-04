@@ -2,19 +2,19 @@
 #define TESTS_HPP
 
 #include "utility.hpp"
-#include "merge_sort_cpu.hpp"
+#include "merge_sort_gpu.hpp"
 
 void runTests(std::vector<int>& v, std::vector<int>& input)
     {
         using ms = std::chrono::duration<double, std::milli>;
-        const int runCount = 10;
+        const int runCount = 1;
         std::array<ms, runCount> executionTime;
-        std::cout<< "Running CPU::MergeSort::mergeSortParallel " << runCount << " times\n";
+        std::cout<< "Running GPU::MergeSort::sort " << runCount << " times\n";
         for(int i = 0; i < runCount; i++)
         {
-            executionTime[i] = Utility::measureExecutionTime("CPU::MergeSort::mergeSortParallel", 
+            executionTime[i] = Utility::measureExecutionTime("GPU::MergeSort::sort", 
                                 [&]() {
-                                    CPU::MergeSort::sort(v, PARALLEL);
+                                    GPU::MergeSort::sort(v);
                                 });
 
             Utility::validateSort(v);
@@ -33,50 +33,6 @@ void runTests(std::vector<int>& v, std::vector<int>& input)
 
         std::cout << "Mean: " << mean.count() << " ms\n";
         std::cout << "Uncertainty: " << uncertainty.count() << " ms\n";
-    }
-
-    void runAll(std::vector<int>& v, std::vector<int>& input)
-    {
-        // Merge Sort iTERATIVE
-        Utility::measureExecutionTime("CPU::IterativeMergeSort::sortParallel", 
-        [&]() {
-            CPU::MergeSort::sort(v, ITERATIVE);
-        });
-        Utility::validateSort(v);
-        v.assign(input.begin(), input.end());
-
-
-        // STL Sort
-        Utility::measureExecutionTime("std::sort", 
-        [&]() {
-            std::sort(v.begin(), v.end());
-        });
-        Utility::validateSort(v);
-        v.assign(input.begin(), input.end());
-
-        // Merge Sort Sequential
-        Utility::measureExecutionTime("CPU::MergeSort::mergeSortSequential", 
-        [&]() {
-            CPU::MergeSort::sort(v, SEQUENTIAL);
-        });
-        Utility::validateSort(v);
-        v.assign(input.begin(), input.end());
-
-        // Merge Sort Sequential
-        Utility::measureExecutionTime("CPU::MergeSort::mergeSortSequentialWithCutOff", 
-        [&]() {
-            CPU::MergeSort::sort(v, SEQUENTIAL_WITH_CUT_OFF);
-        });
-        Utility::validateSort(v);
-        v.assign(input.begin(), input.end());
-
-        // Merge Sort Parallel
-        Utility::measureExecutionTime("CPU::MergeSort::mergeSortParallel", 
-        [&]() {
-            CPU::MergeSort::sort(v, PARALLEL);
-        });
-        Utility::validateSort(v);
-        v.assign(input.begin(), input.end());
     }
 
 #endif //TESTS_HPP
